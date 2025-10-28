@@ -6,3 +6,6 @@ pandas
 pillow
 python-dotenv
 pytesseract
+pypdf
+requests
+cryptography
