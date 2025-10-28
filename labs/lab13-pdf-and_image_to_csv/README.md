@@ -32,7 +32,7 @@ export AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 ### 3. Run Extraction
 Single image:
 ```bash
-python extract_courses_to_csv.py input/image/131-output-1.png --out courses.csv
+python extract_courses_to_csv.py input/image/131-output-1.png --out output/courses.csv
 ```
 
 Folder of images:

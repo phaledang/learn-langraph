@@ -199,6 +199,9 @@ def process_images_to_csv(
         record = extract_record_from_image(llm, p)
         rows.append(record.model_dump())
 
+    # Create output directory if it doesn't exist
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    
     df = pd.DataFrame(rows)
     df.to_csv(out_csv, index=False)
     print(f"[done] Wrote {len(df)} rows to {out_csv}")
