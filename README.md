@@ -4,14 +4,23 @@ A comprehensive step-by-step learning repository for mastering LangChain, LangGr
 
 ## 📚 Table of Contents
 
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [Project Structure](#project-structure)
-- [Setup Instructions](#setup-instructions)
-- [Learning Path](#learning-path)
-- [Database State Persistence](#database-state-persistence)
-- [Labs Overview](#labs-overview)
-- [Contributing](#contributing)
+- [Learn LangChain, LangGraph, LangSmith \& MCP](#learn-langchain-langgraph-langsmith--mcp)
+  - [📚 Table of Contents](#-table-of-contents)
+  - [🎯 Overview](#-overview)
+  - [📋 Prerequisites](#-prerequisites)
+  - [📁 Project Structure](#-project-structure)
+  - [🚀 Setup Instructions](#-setup-instructions)
+  - [🎓 Learning Path](#-learning-path)
+    - [Phase 1: LangChain Fundamentals (Labs 1-4)](#phase-1-langchain-fundamentals-labs-1-4)
+    - [Phase 2: LangGraph (Labs 5-8)](#phase-2-langgraph-labs-5-8)
+    - [Phase 3: LangSmith (Labs 9-10)](#phase-3-langsmith-labs-9-10)
+    - [Phase 4: LangChain MCP (Labs 11-12)](#phase-4-langchain-mcp-labs-11-12)
+  - [💾 Database State Persistence](#-database-state-persistence)
+    - [Supported Databases](#supported-databases)
+  - [📊 Labs Overview](#-labs-overview)
+  - [🤝 Contributing](#-contributing)
+  - [📄 License](#-license)
+  - [🙏 Acknowledgments](#-acknowledgments)
 
 ## 🎯 Overview
 
@@ -141,7 +150,7 @@ The state persistence module supports multiple databases based on your connectio
 
 3. **SQL Server**
    ```env
-   DATABASE_CONNECTION_STRING=mssql+pyodbc://user:password@server:1433/dbname?driver=ODBC+Driver+17+for+SQL+Server
+   DATABASE_CONNECTION_STRING=mssql+pyodbc://user:password@server:1433/dbname?driver=ODBC+Driver+18+for+SQL+Server
    ```
 
 The system automatically detects the database type from the connection string and uses the appropriate adapter.

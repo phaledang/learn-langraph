@@ -1,37 +1,54 @@
 # Core LangChain dependencies
-langchain==0.1.0
-langchain-openai==0.0.2
-langchain-community==0.0.10
+langchain>=0.1.0
+langchain-openai>=0.1.0
+langchain-community>=0.0.10
+langchain-core>=0.1.0
 
 # LangGraph
-langgraph==0.0.20
-langgraph-checkpoint==0.0.1
+langgraph>=0.0.30
+langgraph-checkpoint>=0.0.1
 
 # LangSmith
-langsmith==0.0.77
+langsmith>=0.0.77
 
 # Database drivers
 # Azure Cosmos DB
-azure-cosmos==4.5.1
+azure-cosmos>=4.5.1
 
 # PostgreSQL
-psycopg2-binary==2.9.9
-asyncpg==0.29.0
+psycopg2-binary>=2.9.9
+asyncpg>=0.29.0
 
 # SQL Server
-pyodbc==5.0.1
-sqlalchemy==2.0.23
+pyodbc>=5.0.1
+sqlalchemy>=2.0.23
+
+# Data processing and analysis (from lab13)
+pandas
+pydantic>=2.5.3
+
+# Image processing and OCR (from lab13)
+pillow
+pytesseract
+
+# PDF processing (from lab13)
+pypdf
+
+# Web requests (from lab13)
+requests
+
+# Security and cryptography (from lab13)
+cryptography
 
 # Utilities
-python-dotenv==1.0.0
-pydantic==2.5.3
-typing-extensions==4.9.0
+python-dotenv>=1.0.0
+typing-extensions>=4.9.0
 
 # Optional: Additional LLM providers
-anthropic==0.8.1
-cohere==4.37
+anthropic>=0.8.1
+cohere>=4.37
 
 # Development tools
-pytest==7.4.3
-black==23.12.1
-flake8==7.0.0
+pytest>=7.4.3
+black>=23.12.1
+flake8>=7.0.0
