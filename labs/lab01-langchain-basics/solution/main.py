@@ -5,13 +5,14 @@ A complete implementation of basic LangChain concepts.
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.schema.output_parser import StrOutputParser
+from langchain_openai import AzureChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from .env file relative to this script
+load_dotenv(Path(__file__).parent / ".env")
 
 
 def main():
@@ -22,10 +23,12 @@ def main():
     
     # Task 1: Initialize LLM Model
     print("Task 1: Initializing LLM Model...")
-    llm = ChatOpenAI(
-        model="gpt-3.5-turbo",
+    llm = AzureChatOpenAI(
+        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
         temperature=0.7,
-        api_key=os.getenv("OPENAI_API_KEY")
     )
     print("✓ LLM initialized\n")
     
@@ -80,8 +83,8 @@ Poem:"""
 
 if __name__ == "__main__":
     # Check if API key is set
-    if not os.getenv("OPENAI_API_KEY"):
-        print("Error: OPENAI_API_KEY not found in environment variables.")
+    if not os.getenv("AZURE_OPENAI_API_KEY"):
+        print("Error: AZURE_OPENAI_API_KEY not found in environment variables.")
         print("Please set it in your .env file.")
         exit(1)
     

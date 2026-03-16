@@ -11,34 +11,54 @@ import os
 - **Purpose**: Provides functions for interacting with the operating system
 - **Usage in Lab**: Access environment variables using `os.getenv()`
 
+### `pathlib` - `Path`
+```python
+from pathlib import Path
+```
+- **Purpose**: Object-oriented filesystem path handling
+- **Usage in Lab**: Resolve the `.env` file path relative to the script location
+- **Key Features**:
+  - `Path(__file__)` — path to the current script
+  - `.parent` — parent directory of the path
+  - `/` operator — join paths (e.g., `Path(__file__).parent / ".env"`)
+
 ### `dotenv` - `load_dotenv()`
 ```python
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 ```
 - **Purpose**: Loads environment variables from a `.env` file
 - **Returns**: `True` if `.env` file is found, `False` otherwise
-- **Usage**: Automatically loads API keys and configuration without hardcoding
+- **Parameters**:
+  - `dotenv_path` (optional): Explicit path to the `.env` file
+- **Usage**: Loads API keys and configuration without hardcoding
+- **Best Practice**: Use `Path(__file__).parent / ".env"` to resolve the `.env` file relative to the script, so it works regardless of the working directory
 
 ## LangChain Components
 
-### `ChatOpenAI` Class
+### `AzureChatOpenAI` Class
 ```python
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 
-llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
+llm = AzureChatOpenAI(
+    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
     temperature=0.7,
-    api_key=os.getenv("OPENAI_API_KEY")
 )
 ```
 
 **Constructor Parameters:**
-- `model` (str): The OpenAI model to use (e.g., "gpt-3.5-turbo", "gpt-4")
+- `azure_deployment` (str): The name of your Azure OpenAI deployment (e.g., "gpt-5.4")
+- `azure_endpoint` (str): Your Azure OpenAI resource endpoint (e.g., `https://<resource>.cognitiveservices.azure.com/`)
+- `api_key` (str): Your Azure OpenAI API key
+- `api_version` (str): The Azure OpenAI API version (e.g., "2024-05-01-preview")
 - `temperature` (float, 0.0-2.0): Controls randomness. Higher = more creative
-- `api_key` (str): Your OpenAI API key
 
-**Purpose**: Creates an interface to OpenAI's chat models
+**Purpose**: Creates an interface to Azure OpenAI's chat models
+
+> **Note**: The endpoint should NOT include `/openai/v1` — the SDK adds the path automatically.
 
 **Common Methods:**
 - `invoke(messages)`: Send a single request
@@ -47,7 +67,7 @@ llm = ChatOpenAI(
 
 ### `PromptTemplate` Class
 ```python
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 prompt = PromptTemplate(
     input_variables=["topic"],
@@ -72,7 +92,7 @@ prompt.format(topic="AI")  # Returns: "Write a poem about AI"
 
 ### `StrOutputParser` Class
 ```python
-from langchain.schema.output_parser import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 
 parser = StrOutputParser()
 ```
@@ -174,7 +194,7 @@ with open("file.txt") as f:
 
 ### `os.getenv(key, default=None)`
 ```python
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("AZURE_OPENAI_API_KEY")
 ```
 - **Purpose**: Retrieve environment variable value
 - **Parameters**: 
@@ -182,15 +202,28 @@ api_key = os.getenv("OPENAI_API_KEY")
   - `default` (optional): Value to return if key not found
 - **Returns**: String value or `default`
 
+### Azure OpenAI Environment Variables
+
+The following variables are required in your `.env` file:
+
+```dotenv
+USE_AZURE_OPENAI=1
+AZURE_OPENAI_ENDPOINT=https://<your-resource>.cognitiveservices.azure.com/
+AZURE_OPENAI_API_KEY=<your-api-key>
+AZURE_OPENAI_DEPLOYMENT=<your-deployment-name>
+AZURE_OPENAI_API_VERSION=2024-05-01-preview
+```
+
 ### Best Practices
 1. **Never hardcode API keys**: Use environment variables
 2. **Use `.env` file**: Keep secrets out of version control
 3. **Add `.env` to `.gitignore`**: Prevent accidental commits
 4. **Validate presence**: Check if required variables exist
+5. **Use script-relative paths**: Load `.env` with `Path(__file__).parent / ".env"`
 
 ```python
-if not os.getenv("OPENAI_API_KEY"):
-    raise ValueError("OPENAI_API_KEY not set")
+if not os.getenv("AZURE_OPENAI_API_KEY"):
+    raise ValueError("AZURE_OPENAI_API_KEY not set")
 ```
 
 ## Error Handling
@@ -246,11 +279,13 @@ def process_topics(topics: List[str]) -> List[str]:
 ## Summary
 
 Key methods to remember:
-1. `load_dotenv()` - Load environment variables
-2. `ChatOpenAI()` - Create LLM instance
-3. `PromptTemplate()` - Create prompt template
-4. `chain.invoke()` - Execute chain with single input
-5. `chain.batch()` - Execute chain with multiple inputs
-6. `os.getenv()` - Get environment variable
+1. `Path(__file__).parent / ".env"` - Resolve `.env` relative to script
+2. `load_dotenv(path)` - Load environment variables from a specific path
+3. `AzureChatOpenAI()` - Create Azure OpenAI LLM instance
+4. `PromptTemplate()` - Create prompt template (from `langchain_core.prompts`)
+5. `StrOutputParser()` - Parse LLM output to string (from `langchain_core.output_parsers`)
+6. `chain.invoke()` - Execute chain with single input
+7. `chain.batch()` - Execute chain with multiple inputs
+8. `os.getenv()` - Get environment variable
 
-These form the foundation of working with LangChain and will be used throughout all labs.
+These form the foundation of working with LangChain and Azure OpenAI, and will be used throughout all labs.
