@@ -66,10 +66,10 @@ source venv/bin/activate
 
 ### 5. Install Dependencies from requirements.txt
 
-With the `venv` activated, install all required packages:
+With the `venv` activated, install the lab-specific packages from the project root:
 
 ```bash
-pip install -r requirements.txt
+pip install -r labs/lab01-langchain-basics/requirements.txt
 ```
 
 This installs the core packages needed across all labs, including:
@@ -99,15 +99,16 @@ AZURE_OPENAI_API_VERSION=2024-05-01-preview
 
 ### 7. Run the Lab
 
+From the **project root** (`c:\code\learn\learn-langraph`):
+
 ```bash
-cd labs\lab01-langchain-basics\solution
-python main.py
+python labs/lab01-langchain-basics/solution/main.py
 ```
 
 Or using the full `venv` path directly (without activating):
 
 ```powershell
-C:/code/learn/learn-langraph/venv/Scripts/python.exe main.py
+C:/code/learn/learn-langraph/venv/Scripts/python.exe labs/lab01-langchain-basics/solution/main.py
 ```
 
 ---
@@ -120,7 +121,8 @@ cd c:\code\learn\learn-langraph
 Remove-Item -Recurse -Force .\venv
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -r labs/lab01-langchain-basics/requirements.txt
+python labs/lab01-langchain-basics/solution/main.py
 ```
 
 **macOS / Linux:**
@@ -129,7 +131,8 @@ cd /path/to/learn-langraph
 rm -rf venv
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r labs/lab01-langchain-basics/requirements.txt
+python labs/lab01-langchain-basics/solution/main.py
 ```
 
 ---

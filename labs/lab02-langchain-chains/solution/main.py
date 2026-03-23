@@ -5,23 +5,31 @@ Advanced chain patterns including sequential, router, and RAG chains.
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain.prompts import PromptTemplate
-from langchain.schema.output_parser import StrOutputParser
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain_openai import AzureChatOpenAI, AzureOpenAIEmbeddings
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
-from langchain.schema import Document
+from langchain_core.documents import Document
 
-load_dotenv()
+# Load environment variables from .env file relative to this script
+load_dotenv(Path(__file__).parent / ".env")
 
 
 def task1_sequential_chain():
     """Demonstrate sequential chain processing."""
     print("\n=== Task 1: Sequential Chain ===")
     
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.3)
+    llm = AzureChatOpenAI(
+        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        temperature=0.3,
+    )
     
     # Step 1: Summarization
     summarize_template = """Summarize the following text in 2-3 sentences:
@@ -74,7 +82,13 @@ def task2_router_chain():
     """Demonstrate router chain with conditional routing."""
     print("\n\n=== Task 2: Router Chain ===")
     
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+    llm = AzureChatOpenAI(
+        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        temperature=0.7,
+    )
     
     # Different prompts for different query types
     math_template = """You are a math tutor. Solve this math problem step by step:
@@ -159,7 +173,12 @@ def task3_rag_implementation():
     splits = text_splitter.split_documents(documents)
     
     # Create embeddings and vector store
-    embeddings = OpenAIEmbeddings()
+    embeddings = AzureOpenAIEmbeddings(
+        azure_deployment=os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-ada-002"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+    )
     vectorstore = Chroma.from_documents(
         documents=splits,
         embedding=embeddings,
@@ -167,7 +186,13 @@ def task3_rag_implementation():
     )
     
     # Create retrieval chain
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    llm = AzureChatOpenAI(
+        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        temperature=0,
+    )
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -193,8 +218,8 @@ def main():
     print("=== Lab 02: LangChain Chains - Solution ===")
     
     # Check API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("Error: OPENAI_API_KEY not set")
+    if not os.getenv("AZURE_OPENAI_API_KEY"):
+        print("Error: AZURE_OPENAI_API_KEY not set")
         return
     
     task1_sequential_chain()
