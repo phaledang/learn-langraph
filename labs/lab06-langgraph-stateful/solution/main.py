@@ -11,15 +11,17 @@ from typing_extensions import Literal
 from datetime import datetime
 import json
 
+from pathlib import Path
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 from langchain_core.tools import tool
 
-load_dotenv()
+# Load environment variables from .env file relative to this script
+load_dotenv(Path(__file__).parent / ".env")
 
 
 # Step 1: Define State Schema
@@ -56,10 +58,12 @@ class DocumentApprovalState(TypedDict):
 # Step 2: Initialize LLM
 def get_llm():
     """Initialize the language model."""
-    return ChatOpenAI(
-        model="gpt-4o-mini",
+    return AzureChatOpenAI(
+        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
         temperature=0.1,
-        api_key=os.getenv("OPENAI_API_KEY")
     )
 
 
@@ -581,9 +585,9 @@ def main():
     print("="*80)
     
     # Check API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("❌ Error: OPENAI_API_KEY not set")
-        print("Please set your OpenAI API key in the .env file")
+    if not os.getenv("AZURE_OPENAI_API_KEY"):
+        print("❌ Error: AZURE_OPENAI_API_KEY not set")
+        print("Please set your Azure OpenAI API key in the .env file")
         return
     
     try:
