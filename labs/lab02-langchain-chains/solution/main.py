@@ -12,8 +12,8 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-from langchain.chains import RetrievalQA
 from langchain_core.documents import Document
+from langchain_core.runnables import RunnablePassthrough
 
 # Load environment variables from .env file relative to this script
 load_dotenv(Path(__file__).parent / ".env")
@@ -185,7 +185,7 @@ def task3_rag_implementation():
         collection_name="langchain_docs"
     )
     
-    # Create retrieval chain
+    # Create retrieval chain using LCEL
     llm = AzureChatOpenAI(
         azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -193,10 +193,25 @@ def task3_rag_implementation():
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
         temperature=0,
     )
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=vectorstore.as_retriever(search_kwargs={"k": 2})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
+    
+    qa_template = """Use the following context to answer the question. If you don't know the answer, say you don't know.
+
+Context: {context}
+
+Question: {question}
+
+Answer:"""
+    qa_prompt = PromptTemplate(template=qa_template, input_variables=["context", "question"])
+    
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
+    qa_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | qa_prompt
+        | llm
+        | StrOutputParser()
     )
     
     # Test queries
@@ -208,8 +223,8 @@ def task3_rag_implementation():
     
     for question in questions:
         print(f"\nQuestion: {question}")
-        answer = qa_chain.invoke({"query": question})
-        print(f"Answer: {answer['result']}\n")
+        answer = qa_chain.invoke(question)
+        print(f"Answer: {answer}\n")
         print("-" * 80)
 
 
