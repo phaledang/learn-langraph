@@ -3,3 +3,9 @@ langchain-openai>=0.1.0
 langchain-core>=0.1.0
 langgraph>=0.0.30
 python-dotenv>=1.0.0
+
+# Graph visualisation (optional – gracefully skipped if missing)
+matplotlib>=3.7.0
+networkx>=3.0
+pyvis>=0.3.0
+# graphviz  # also needs system-level Graphviz installed

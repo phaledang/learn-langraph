@@ -251,17 +251,52 @@ def build_multiagent_graph():
 
 
 # ---------------------------------------------------------------------------
+# Graph visualisation helpers
+# ---------------------------------------------------------------------------
+def _extract_nodes_and_edges(graph):
+    """Extract node IDs and (source, target, label) tuples from a LangGraph graph.
+
+    Handles multiple LangGraph API versions where nodes/edges may be
+    strings, dicts, named tuples, or objects with attributes.
+    """
+    compiled = graph.compile() if isinstance(graph, StateGraph) else graph
+    lg = compiled.get_graph()
+
+    # --- nodes ---
+    node_ids: list[str] = []
+    if isinstance(lg.nodes, dict):
+        node_ids = list(lg.nodes.keys())
+    else:
+        for n in lg.nodes:
+            node_ids.append(n.id if hasattr(n, "id") else str(n))
+
+    # --- edges ---
+    edge_list: list[tuple[str, str, str]] = []
+    for e in lg.edges:
+        if isinstance(e, (list, tuple)):
+            src, tgt = str(e[0]), str(e[1])
+            lbl = str(e[2]) if len(e) > 2 else ""
+        elif hasattr(e, "source"):
+            src, tgt = str(e.source), str(e.target)
+            lbl = str(e.data) if hasattr(e, "data") and e.data else ""
+        else:
+            continue
+        edge_list.append((src, tgt, lbl))
+
+    return node_ids, edge_list, compiled
+
+
+# ---------------------------------------------------------------------------
 # Graph visualisation
 # ---------------------------------------------------------------------------
 def generate_graph_image(graph, output_path: str = None) -> str:
-    """Generate a PNG image of the LangGraph workflow."""
+    """Generate a PNG image of the LangGraph workflow using Mermaid (requires internet)."""
     if output_path is None:
-        output_path = str(Path(__file__).parent / "multiagent_workflow_graph.png")
+        output_path = str(_script_dir / "multiagent_workflow_graph.png")
 
-    # Accept both compiled and uncompiled graphs
     compiled = graph.compile() if isinstance(graph, StateGraph) else graph
 
-    print("📸 Generating graph image...")
+    print("📸 Generating graph image (Mermaid)...")
     png_bytes = compiled.get_graph().draw_mermaid_png()
 
     with open(output_path, "wb") as f:
@@ -269,6 +304,170 @@ def generate_graph_image(graph, output_path: str = None) -> str:
 
     print(f"✅ Graph image saved to: {output_path}")
     return output_path
+
+
+def generate_graph_networkx(graph, output_path: str = None) -> str:
+    """Generate a PNG image using matplotlib + networkx (works offline, no external tools)."""
+    import matplotlib
+    matplotlib.use("Agg")                     # non-interactive backend
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+    import networkx as nx
+
+    if output_path is None:
+        output_path = str(_script_dir / "multiagent_workflow_networkx.png")
+
+    node_ids, edge_list, _ = _extract_nodes_and_edges(graph)
+
+    G = nx.DiGraph()
+    for nid in node_ids:
+        G.add_node(nid)
+    for src, tgt, lbl in edge_list:
+        G.add_edge(src, tgt, label=lbl)
+
+    # Agent-role colours
+    colour_map = {
+        "__start__": "#9E9E9E",
+        "researcher": "#42A5F5",   # blue
+        "writer": "#66BB6A",       # green
+        "supervisor": "#FFA726",   # orange
+        "__end__": "#9E9E9E",
+    }
+    node_colours = [colour_map.get(n, "#CE93D8") for n in G.nodes()]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    pos = nx.spring_layout(G, seed=42, k=2.5)
+
+    nx.draw_networkx_nodes(G, pos, node_color=node_colours, node_size=3000,
+                           edgecolors="black", linewidths=1.5, ax=ax)
+    nx.draw_networkx_labels(G, pos, font_size=10, font_weight="bold", ax=ax)
+    nx.draw_networkx_edges(G, pos, edge_color="#555555", width=2,
+                           arrows=True, arrowsize=25,
+                           connectionstyle="arc3,rad=0.15", ax=ax)
+
+    edge_labels = nx.get_edge_attributes(G, "label")
+    edge_labels = {k: v for k, v in edge_labels.items() if v}
+    if edge_labels:
+        nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=8,
+                                     font_color="#888888", ax=ax)
+
+    legend_handles = [
+        mpatches.Patch(color="#42A5F5", label="Researcher"),
+        mpatches.Patch(color="#66BB6A", label="Writer"),
+        mpatches.Patch(color="#FFA726", label="Supervisor"),
+    ]
+    ax.legend(handles=legend_handles, loc="upper left", fontsize=9)
+
+    ax.set_title("Multi-Agent Workflow", fontsize=14, fontweight="bold")
+    ax.axis("off")
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+    print(f"✅ NetworkX graph image saved to: {output_path}")
+    return output_path
+
+
+def generate_graph_pyvis(graph, output_path: str = None) -> str:
+    """Generate an interactive HTML graph using pyvis (open in browser)."""
+    from pyvis.network import Network
+
+    if output_path is None:
+        output_path = str(_script_dir / "multiagent_workflow_pyvis.html")
+
+    node_ids, edge_list, _ = _extract_nodes_and_edges(graph)
+
+    net = Network(directed=True, height="600px", width="100%",
+                  bgcolor="#ffffff", font_color="#333333")
+    net.barnes_hut(gravity=-3000, central_gravity=0.3, spring_length=200)
+
+    colour_map = {
+        "__start__": "#9E9E9E",
+        "researcher": "#42A5F5",
+        "writer": "#66BB6A",
+        "supervisor": "#FFA726",
+        "__end__": "#9E9E9E",
+    }
+    shape_map = {
+        "__start__": "diamond",
+        "__end__": "diamond",
+    }
+
+    for nid in node_ids:
+        net.add_node(
+            nid,
+            label=nid,
+            color=colour_map.get(nid, "#CE93D8"),
+            shape=shape_map.get(nid, "ellipse"),
+            size=30,
+            font={"size": 16, "face": "arial", "bold": True},
+        )
+
+    for src, tgt, lbl in edge_list:
+        net.add_edge(src, tgt, label=lbl,
+                     arrows="to", color="#555555", width=2)
+
+    net.write_html(output_path)
+    print(f"✅ Interactive pyvis graph saved to: {output_path}")
+    return output_path
+
+
+def generate_graph_graphviz(graph, output_path: str = None) -> str:
+    """Generate a PNG using Graphviz (requires 'graphviz' system install + Python package)."""
+    import graphviz as gv
+
+    if output_path is None:
+        output_path = str(_script_dir / "multiagent_workflow_graphviz")
+
+    node_ids, edge_list, _ = _extract_nodes_and_edges(graph)
+
+    dot = gv.Digraph("MultiAgentWorkflow", format="png",
+                      graph_attr={"rankdir": "TB", "bgcolor": "white",
+                                  "fontname": "Helvetica", "pad": "0.5"},
+                      node_attr={"style": "filled", "fontname": "Helvetica",
+                                 "fontsize": "11", "shape": "box",
+                                 "margin": "0.3,0.15"})
+
+    colour_map = {
+        "__start__": "#9E9E9E",
+        "researcher": "#42A5F5",
+        "writer": "#66BB6A",
+        "supervisor": "#FFA726",
+        "__end__": "#9E9E9E",
+    }
+
+    for nid in node_ids:
+        shape = "diamond" if nid in ("__start__", "__end__") else "box"
+        dot.node(nid, label=nid, fillcolor=colour_map.get(nid, "#CE93D8"),
+                 fontcolor="white", shape=shape)
+
+    for src, tgt, lbl in edge_list:
+        dot.edge(src, tgt, label=lbl)
+
+    dot.render(output_path, cleanup=True)
+    final = output_path + ".png"
+    print(f"✅ Graphviz image saved to: {final}")
+    return final
+
+
+def generate_all_graph_images(graph) -> list[str]:
+    """Try all available visualisation methods; skip any whose deps are missing."""
+    results = []
+    attempts = [
+        ("Mermaid",    generate_graph_image),
+        ("NetworkX",   generate_graph_networkx),
+        ("Pyvis",      generate_graph_pyvis),
+        ("Graphviz",   generate_graph_graphviz),
+    ]
+    for name, fn in attempts:
+        try:
+            path = fn(graph)
+            results.append(path)
+        except ImportError as e:
+            print(f"⏭️  Skipping {name} visualisation (missing dependency: {e})")
+        except Exception as e:
+            print(f"⚠️  {name} visualisation failed: {e}")
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -299,11 +498,10 @@ def main():
         # Build & compile the graph
         app = build_multiagent_graph()
 
-        # Generate graph visualisation (like lab06)
-        generate_graph_image(
-            app,
-            str(Path(__file__).parent / "multiagent_workflow_graph.png"),
-        )
+        # Generate graph visualisations using all available libraries
+        print("\n📸 Generating workflow visualisations...")
+        generated = generate_all_graph_images(app)
+        print(f"   Generated {len(generated)} image(s)\n")
 
         topic = "Machine Learning in Healthcare"
         print(f"\n🤖 Starting multi-agent workflow...")
