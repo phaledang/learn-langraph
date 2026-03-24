@@ -12,7 +12,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, AIMessage, BaseMessage
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph, END, add_messages
 
 # Import our custom state persistence module
