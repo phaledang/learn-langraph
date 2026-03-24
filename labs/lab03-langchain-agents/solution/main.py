@@ -15,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langchain_core.tools import Tool
 from langchain_core.messages import HumanMessage
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 from langchain_openai import AzureChatOpenAI
 
 # Load environment variables from .env file relative to this script
@@ -174,7 +174,7 @@ def task2_react_agent():
 
     llm = _create_llm(temperature=0)
     tools = [calculator_tool, text_analyzer_tool]
-    agent = create_react_agent(llm, tools)
+    agent = create_agent(llm, tools)
 
     # Test the agent with a math question
     print("\nQuestion: What is 25 * 4 + 10?")
@@ -197,7 +197,7 @@ def task3_external_apis():
 
     llm = _create_llm(temperature=0)
     enhanced_tools = [calculator_tool, text_analyzer_tool, weather_tool]
-    enhanced_agent = create_react_agent(llm, enhanced_tools)
+    enhanced_agent = create_agent(llm, enhanced_tools)
 
     print("\nQuestion: What's the weather in New York?")
     result = _run_agent(enhanced_agent, "What's the weather in New York?")
@@ -230,7 +230,7 @@ def task4_error_handling():
 
     llm = _create_llm(temperature=0)
     tools = [calculator_tool, text_analyzer_tool, weather_tool]
-    agent = create_react_agent(llm, tools)
+    agent = create_agent(llm, tools)
 
     challenging_queries = [
         "Calculate the square root of -1",
@@ -263,7 +263,7 @@ def task5_multi_tool_agent():
         unit_converter_tool,
     ]
 
-    ultimate_agent = create_react_agent(llm, ultimate_tools)
+    ultimate_agent = create_agent(llm, ultimate_tools)
 
     complex_query = (
         "I need to: "
