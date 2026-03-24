@@ -7,12 +7,14 @@ nodes, edges, and conditional routing.
 
 import os
 from typing import TypedDict, Literal
+from pathlib import Path
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, AIMessage
+from langchain_openai import AzureChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.graph import StateGraph, END
 
-load_dotenv()
+# Load environment variables from .env file relative to this script
+load_dotenv(Path(__file__).parent / ".env")
 
 
 # Task 1: Define State Schema
@@ -44,7 +46,13 @@ def generate_response(state: AgentState) -> AgentState:
     """Generate LLM response."""
     print(f"\n[Step {state['step']}] Generating response...")
     
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+    llm = AzureChatOpenAI(
+        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        temperature=0.7,
+    )
     
     # Get last user message
     user_message = state["messages"][-1]
@@ -257,8 +265,8 @@ def main():
     print("="*80)
     
     # Check API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("\nNote: OPENAI_API_KEY not set. Skipping LLM demonstrations.")
+    if not os.getenv("AZURE_OPENAI_API_KEY"):
+        print("\nNote: AZURE_OPENAI_API_KEY not set. Skipping LLM demonstrations.")
         print("Simple demonstrations will still run.\n")
     
     # Demonstrate simple graph
@@ -268,7 +276,7 @@ def main():
     demonstrate_conditional_graph()
     
     # Demonstrate full agent with LLM (if API key available)
-    if os.getenv("OPENAI_API_KEY"):
+    if os.getenv("AZURE_OPENAI_API_KEY"):
         print("\n" + "="*80)
         print("DEMONSTRATION 3: Full Agent with LLM")
         print("="*80)

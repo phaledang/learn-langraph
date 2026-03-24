@@ -521,11 +521,11 @@ def task5_persistent_memory():
     print(f"  [Pickle loaded: {len(restored_buffer)} messages]")
 
     # Clean up
-    if MEMORY_DIR.exists():
-        for fp in MEMORY_DIR.iterdir():
-            fp.unlink()
-        MEMORY_DIR.rmdir()
-        print("  [Memory store cleaned up]")
+    # if MEMORY_DIR.exists():
+    #     for fp in MEMORY_DIR.iterdir():
+    #         fp.unlink()
+    #     MEMORY_DIR.rmdir()
+    #     print("  [Memory store cleaned up]")
 
     print("✓ Persistent memory demonstrated")
 
