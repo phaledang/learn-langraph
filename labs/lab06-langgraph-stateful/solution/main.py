@@ -445,7 +445,35 @@ def create_document_approval_system():
     return doc_workflow
 
 
-# Step 8: Main Execution Function
+# Step 8: Generate Graph Image
+def generate_graph_image(graph, output_path: str = None) -> str:
+    """Generate a PNG image of the LangGraph workflow.
+
+    Args:
+        graph: A compiled LangGraph application or a StateGraph.
+        output_path: Optional file path for the output image.
+                     Defaults to 'workflow_graph.png' in the solution directory.
+
+    Returns:
+        The absolute path to the generated image file.
+    """
+    if output_path is None:
+        output_path = str(Path(__file__).parent / "workflow_graph.png")
+
+    # If it's an uncompiled StateGraph, compile it first
+    compiled = graph.compile() if isinstance(graph, StateGraph) else graph
+
+    print(f"📸 Generating graph image...")
+    png_bytes = compiled.get_graph().draw_mermaid_png()
+
+    with open(output_path, "wb") as f:
+        f.write(png_bytes)
+
+    print(f"✅ Graph image saved to: {output_path}")
+    return output_path
+
+
+# Step 9: Main Execution Function
 def run_stateful_workflow_demo():
     """Run demonstration of stateful workflow."""
     print("🎯 Running Stateful Workflow Demo")
@@ -594,6 +622,19 @@ def main():
         # Run all demonstrations
         print("\n🎯 Running Comprehensive Stateful Workflow Demonstrations")
         
+        # 0. Generate graph images
+        stateful_wf = create_stateful_workflow()
+        generate_graph_image(
+            stateful_wf,
+            str(Path(__file__).parent / "stateful_workflow_graph.png"),
+        )
+
+        doc_wf = create_document_approval_system()
+        generate_graph_image(
+            doc_wf,
+            str(Path(__file__).parent / "document_approval_graph.png"),
+        )
+
         # 1. Basic stateful workflow
         result1 = run_stateful_workflow_demo()
         
@@ -608,6 +649,7 @@ def main():
         print("="*80)
         
         print("\n📋 Summary:")
+        print("✅ Graph images generated")
         print("✅ Stateful workflow with memory")
         print("✅ Human-in-the-loop integration")
         print("✅ Document approval system")
