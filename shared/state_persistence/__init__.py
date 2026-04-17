@@ -7,9 +7,11 @@ Automatically detects and uses the appropriate database based on connection stri
 
 from .base import BaseStatePersistence, StateDocument
 from .factory import create_state_persistence
+from .sqlite import SQLiteStatePersistence
 
 __all__ = [
     'BaseStatePersistence',
     'StateDocument',
+    'SQLiteStatePersistence',
     'create_state_persistence'
 ]

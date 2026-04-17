@@ -9,6 +9,7 @@ from typing import Optional
 from .base import BaseStatePersistence
 from .cosmosdb import CosmosDBStatePersistence
 from .postgresql import PostgreSQLStatePersistence
+from .sqlite import SQLiteStatePersistence
 from .sqlserver import SQLServerStatePersistence
 
 
@@ -27,6 +28,10 @@ def detect_database_type(connection_string: str) -> str:
     """
     connection_string_lower = connection_string.lower()
     
+    # Check for SQLite
+    if connection_string_lower.startswith('sqlite:///'):
+        return 'sqlite'
+    
     # Check for Cosmos DB
     if 'accountendpoint' in connection_string_lower and 'accountkey' in connection_string_lower:
         return 'cosmosdb'
@@ -42,6 +47,7 @@ def detect_database_type(connection_string: str) -> str:
     raise ValueError(
         f"Unable to detect database type from connection string. "
         f"Supported formats: "
+        f"SQLite (sqlite:///path/to/db), "
         f"Cosmos DB (AccountEndpoint=...), "
         f"PostgreSQL (postgresql://...), "
         f"SQL Server (mssql+pyodbc://...)"
@@ -96,7 +102,9 @@ def create_state_persistence(
     db_type = detect_database_type(connection_string)
     
     # Create appropriate instance
-    if db_type == 'cosmosdb':
+    if db_type == 'sqlite':
+        return SQLiteStatePersistence(connection_string, table_name)
+    elif db_type == 'cosmosdb':
         return CosmosDBStatePersistence(connection_string, table_name)
     elif db_type == 'postgresql':
         return PostgreSQLStatePersistence(connection_string, table_name)

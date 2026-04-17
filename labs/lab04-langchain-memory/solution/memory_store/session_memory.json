@@ -1,0 +1,20 @@
+{
+  "messages": [
+    {
+      "type": "human",
+      "content": "Hi, my name is Charlie and I live in Tokyo."
+    },
+    {
+      "type": "ai",
+      "content": "Hi Charlie! Nice to meet you \u2014 and hello to Tokyo. How can I help you today?"
+    },
+    {
+      "type": "human",
+      "content": "I'm a software engineer working on AI projects."
+    },
+    {
+      "type": "ai",
+      "content": "Very cool \u2014 AI projects are a great space to be in, Charlie. I\u2019ll keep in mind that you\u2019re a software engineer working on AI. What are you building right now?"
+    }
+  ]
+}

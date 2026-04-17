@@ -6,10 +6,13 @@ Complete the TODOs to implement state persistence.
 
 import os
 import asyncio
+from pathlib import Path
 from typing import TypedDict
 from dotenv import load_dotenv
 
-load_dotenv()
+_script_dir = Path(__file__).parent
+load_dotenv(_script_dir / ".env")          # primary
+load_dotenv(_script_dir / ".env.sample")   # fallback for defaults
 
 
 # TODO: Task 1 - Import State Persistence Module

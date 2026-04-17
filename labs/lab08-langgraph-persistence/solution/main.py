@@ -7,11 +7,12 @@ Demonstrates saving and resuming graph state across sessions.
 
 import os
 import asyncio
+from pathlib import Path
 from typing import TypedDict, Annotated
 from datetime import datetime
 from dotenv import load_dotenv
 
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langgraph.graph import StateGraph, END, add_messages
 
@@ -20,7 +21,22 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from shared.state_persistence import create_state_persistence
 
-load_dotenv()
+_script_dir = Path(__file__).parent
+load_dotenv(_script_dir / ".env")          # primary
+load_dotenv(_script_dir / ".env.sample")   # fallback for defaults
+
+
+def get_llm(temperature: float = 0.7) -> ChatOpenAI | AzureChatOpenAI:
+    """Return an LLM configured from environment variables."""
+    if os.getenv("USE_AZURE_OPENAI", "0") == "1":
+        return AzureChatOpenAI(
+            azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4"),
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", ""),
+            api_key=os.getenv("AZURE_OPENAI_API_KEY", ""),
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-05-01-preview"),
+            temperature=temperature,
+        )
+    return ChatOpenAI(model="gpt-3.5-turbo", temperature=temperature)
 
 
 # Task 2: Define State Schema
@@ -44,7 +60,7 @@ def generate_response(state: ConversationState) -> ConversationState:
     """Generate AI response using LLM."""
     print(f"[Step {state['step']}] Generating response...")
     
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+    llm = get_llm(temperature=0.7)
     
     # Get conversation history
     messages = state["messages"]
@@ -215,7 +231,11 @@ async def demo_conversational_agent():
     print("DEMO 2: Persistent Conversational Agent")
     print("="*80)
     
-    if not os.getenv("OPENAI_API_KEY"):
+    use_azure = os.getenv("USE_AZURE_OPENAI", "0") == "1"
+    if use_azure and not os.getenv("AZURE_OPENAI_API_KEY"):
+        print("\nSkipping: AZURE_OPENAI_API_KEY not set")
+        return
+    if not use_azure and not os.getenv("OPENAI_API_KEY"):
         print("\nSkipping: OPENAI_API_KEY not set")
         return
     
