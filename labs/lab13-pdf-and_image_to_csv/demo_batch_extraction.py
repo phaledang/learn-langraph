@@ -34,24 +34,24 @@ def main():
     print("=" * 60)
     
     # Check if the batch script exists
-    if not Path("batch_extract_courses.py").exists():
-        print("❌ batch_extract_courses.py not found!")
+    if not Path("batch_extract_items.py").exists():
+        print("❌ batch_extract_items.py not found!")
         sys.exit(1)
     
     print("\n1️⃣ List available input folders:")
-    run_command([sys.executable, "batch_extract_courses.py", "--list-folders", "dummy"])
+    run_command([sys.executable, "batch_extract_items.py", "--list-folders", "dummy"])
     
     print("\n2️⃣ Extract from a specific page range (using guidelines from each folder):")
     print("This will process all folders and extract from page 131 to 135")
-    run_command([sys.executable, "batch_extract_courses.py", "read from page 131 to page 135"])
+    run_command([sys.executable, "batch_extract_items.py", "read from page 131 to page 135"])
     
     print("\n3️⃣ Extract from a specific folder:")
     print("This will process only folder 233878 from page 131 to 140")
-    run_command([sys.executable, "batch_extract_courses.py", "--folder", "233878", "page 131 to 140"])
+    run_command([sys.executable, "batch_extract_items.py", "--folder", "233878", "page 131 to 140"])
     
     print("\n4️⃣ Test single page extraction with guidelines:")
     print("This shows how the original script now uses guidelines automatically")
-    run_command([sys.executable, "extract_courses.py", "page 131", "--pdf-folder", "233878", "--max-pages", "3"])
+    run_command([sys.executable, "extract_items.py", "page 131", "--pdf-folder", "233878", "--max-pages", "3"])
     
     print("\n✅ Demo completed!")
     print("\nKey features demonstrated:")

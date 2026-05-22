@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Process Courses - Clean Workflow
+Process items - Clean Workflow
 
 This script implements a clean workflow for course extraction:
 1. Copy input files to process folder
@@ -187,8 +187,8 @@ Include all course details: code, title, units, description, prerequisites, etc.
     return start_page, end_page
 
 
-def extract_courses_with_openai(text: str, guide_content: str, page_range: str) -> Optional[str]:
-    """Extract courses using Azure OpenAI API."""
+def extract_items_with_openai(text: str, guide_content: str, page_range: str) -> Optional[str]:
+    """Extract items using Azure OpenAI API."""
     try:
         # Load environment variables
         load_dotenv()
@@ -239,8 +239,8 @@ Return only the course data rows in CSV format.
         return None
 
 
-def extract_courses_for_page_range(process_folder: str, start_page: int, end_page: int, max_pages: int = 3) -> None:
-    """Extract courses for the specified page range."""
+def extract_items_for_page_range(process_folder: str, start_page: int, end_page: int, max_pages: int = 3) -> None:
+    """Extract items for the specified page range."""
     process_path = Path(process_folder)
     pages_dir = process_path / "pages"
     results_dir = process_path / "results"
@@ -301,14 +301,14 @@ Please extract all course information from the above text and return as CSV form
             print(f"   📝 Saved batch text: {batch_file}")
             print(f"   📄 Pages processed: {pages_found}")
             
-            # Extract courses using OpenAI
+            # Extract items using OpenAI
             page_range_str = f"{current_page}-{batch_end}"
             print(f"   🤖 Extracting with OpenAI...")
             
-            csv_content = extract_courses_with_openai(combined_text, guide_content, page_range_str)
+            csv_content = extract_items_with_openai(combined_text, guide_content, page_range_str)
             
             # Create CSV file
-            csv_file = results_dir / f"courses_pages_{current_page}_{batch_end}.csv"
+            csv_file = results_dir / f"items_pages_{current_page}_{batch_end}.csv"
             
             if csv_content and csv_content.strip():
                 # Add CSV header if not present
@@ -319,20 +319,20 @@ Please extract all course information from the above text and return as CSV form
                 with open(csv_file, 'w', encoding='utf-8') as f:
                     f.write(csv_content)
                 
-                print(f"   ✅ Created CSV with courses: {csv_file}")
+                print(f"   ✅ Created CSV with items: {csv_file}")
                 
-                # Count courses extracted
+                # Count items extracted
                 lines = csv_content.strip().split('\n')
                 course_count = len([line for line in lines if line and not line.startswith('course_code') and not line.startswith('#')])
-                print(f"   📊 Courses found: {course_count}")
+                print(f"   📊 items found: {course_count}")
                 
             else:
                 # Create placeholder if extraction failed
                 with open(csv_file, 'w', encoding='utf-8') as f:
                     f.write("course_code,course_title,units,section,description,prerequisites,corequisites,recommended,offered,grade_basis,pdf_page,department\n")
-                    f.write(f"# No courses found or extraction failed for pages {current_page} to {batch_end}\n")
+                    f.write(f"# No items found or extraction failed for pages {current_page} to {batch_end}\n")
                 
-                print(f"   ⚠️ No courses extracted: {csv_file}")
+                print(f"   ⚠️ No items extracted: {csv_file}")
         
         current_page += max_pages
         batch_num += 1
@@ -347,8 +347,8 @@ def create_consolidated_csv(results_dir: Path, start_page: int, end_page: int) -
     """Consolidate all CSV files into a single file."""
     print(f"\n📋 Creating consolidated CSV...")
     
-    all_courses = []
-    csv_files = list(results_dir.glob("courses_pages_*.csv"))
+    all_items = []
+    csv_files = list(results_dir.glob("items_pages_*.csv"))
     
     for csv_file in sorted(csv_files):
         try:
@@ -360,31 +360,31 @@ def create_consolidated_csv(results_dir: Path, start_page: int, end_page: int) -
                     if line.strip() and not line.startswith('#') and not line.startswith('course_code')]
             
             if lines:
-                all_courses.extend(lines)
-                print(f"   📄 Added {len(lines)} courses from {csv_file.name}")
+                all_items.extend(lines)
+                print(f"   📄 Added {len(lines)} items from {csv_file.name}")
                 
         except Exception as e:
             print(f"   ⚠️ Error reading {csv_file.name}: {e}")
     
     # Create consolidated file
-    consolidated_file = results_dir / f"all_courses_pages_{start_page}_{end_page}.csv"
+    consolidated_file = results_dir / f"all_items_pages_{start_page}_{end_page}.csv"
     
     with open(consolidated_file, 'w', encoding='utf-8') as f:
         # Write header
         f.write("course_code,course_title,units,section,description,prerequisites,corequisites,recommended,offered,grade_basis,pdf_page,department\n")
         
-        # Write all courses
-        for course in all_courses:
+        # Write all items
+        for course in all_items:
             f.write(course + '\n')
     
     print(f"   ✅ Consolidated CSV created: {consolidated_file}")
-    print(f"   📊 Total courses: {len(all_courses)}")
+    print(f"   📊 Total items: {len(all_items)}")
 
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python process_courses.py <input_folder> [--max-pages N]")
-        print("Example: python process_courses.py 233878 --max-pages 3")
+        print("Usage: python process_items.py <input_folder> [--max-pages N]")
+        print("Example: python process_items.py 233878 --max-pages 3")
         sys.exit(1)
     
     input_folder = sys.argv[1]
@@ -412,8 +412,8 @@ def main():
         # Step 3: Build consolidated guide and get page range
         start_page, end_page = build_guide_on_one_page(process_folder)
         
-        # Step 4: Extract courses for page range
-        extract_courses_for_page_range(process_folder, start_page, end_page, max_pages)
+        # Step 4: Extract items for page range
+        extract_items_for_page_range(process_folder, start_page, end_page, max_pages)
         
         print("\n🎉 Workflow completed successfully!")
         print(f"📁 Results available in: {process_folder}/results/")

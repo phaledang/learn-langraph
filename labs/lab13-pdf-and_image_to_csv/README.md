@@ -42,12 +42,12 @@ input/
 
 ### 4. Run Clean Extraction Workflow
 ```bash
-python process_courses.py 233878 --max-pages 3
+python process_items.py 233878 --max-pages 3
 ```
 
 ## 📋 Clean Workflow Steps
 
-The `process_courses.py` script implements a **4-step clean workflow**:
+The `process_items.py` script implements a **4-step clean workflow**:
 
 ### Step 1: 📁 Setup Process Folder
 - Creates timestamped process folder: `process/YYYYMMDD_HHMMSS_foldername/`
@@ -69,14 +69,14 @@ The `process_courses.py` script implements a **4-step clean workflow**:
 - Processes detected page range in configurable batches
 - Uses Azure OpenAI GPT-4o-mini for intelligent course extraction
 - Creates individual CSV files per batch
-- Generates consolidated CSV with all extracted courses
+- Generates consolidated CSV with all extracted items
 
 ## 📊 Sample Results
 
 **Extraction Statistics from Real Run:**
 - **Pages Processed**: 131-198 (68 pages)
 - **Batches Created**: 34 batches
-- **Courses Extracted**: 591 courses
+- **items Extracted**: 591 items
 - **Success Rate**: 100%
 
 
@@ -84,12 +84,12 @@ The `process_courses.py` script implements a **4-step clean workflow**:
 
 ### Command Line Arguments
 ```bash
-python process_courses.py <input_folder> [--max-pages N]
+python process_items.py <input_folder> [--max-pages N]
 
 # Examples:
-python process_courses.py 233878                    # Default 3 pages per batch
-python process_courses.py 233878 --max-pages 5     # 5 pages per batch
-python process_courses.py my_catalog --max-pages 2  # 2 pages per batch
+python process_items.py 233878                    # Default 3 pages per batch
+python process_items.py 233878 --max-pages 5     # 5 pages per batch
+python process_items.py my_catalog --max-pages 2  # 2 pages per batch
 ```
 
 ### Guide.txt Format
@@ -113,13 +113,13 @@ include your sample there
 ### Legacy Scripts (Still Available)
 ```bash
 # Original single-file extraction
-python extract_courses.py --pdf-folder input/233878 --max-pages 3
+python extract_items.py --pdf-folder input/233878 --max-pages 3
 
 # Image-based extraction
-python extract_courses_to_csv.py input/image/131-output-1.png --out output/courses.csv
+python extract_items_to_csv.py input/image/131-output-1.png --out output/items.csv
 
 # Batch processing multiple folders
-python batch_extract_courses.py
+python batch_extract_items.py
 ```
 
 ### Testing Azure OpenAI Connection
@@ -169,6 +169,6 @@ The system has been successfully tested with:
 **Debug Commands:**
 ```bash
 python test_openai.py                    # Test API connection
-python process_courses.py 233878 --max-pages 1  # Test with smaller batches
+python process_items.py 233878 --max-pages 1  # Test with smaller batches
 ```
 

@@ -25,27 +25,27 @@ course/
 ## 🚀 Usage Examples
 
 ### 1. Batch Processing (All Folders)
-Extract courses from all input folders across a page range:
+Extract items from all input folders across a page range:
 ```bash
-python batch_extract_courses.py "read from page 131 to page 198"
+python batch_extract_items.py "read from page 131 to page 198"
 ```
 
 ### 2. Single Folder Processing
-Extract courses from a specific folder:
+Extract items from a specific folder:
 ```bash
-python batch_extract_courses.py --folder 233878 "page 131 to 140"
+python batch_extract_items.py --folder 233878 "page 131 to 140"
 ```
 
 ### 3. List Available Folders
 See which folders have guidelines:
 ```bash
-python batch_extract_courses.py --list-folders "dummy"
+python batch_extract_items.py --list-folders "dummy"
 ```
 
 ### 4. Single Page with Guidelines
 Extract from a single page using automatic guidelines:
 ```bash
-python extract_courses.py "page 131" --pdf-folder 233878 --max-pages 3
+python extract_items.py "page 131" --pdf-folder 233878 --max-pages 3
 ```
 
 ## 📋 Guidelines System
@@ -54,14 +54,13 @@ python extract_courses.py "page 131" --pdf-folder 233878 --max-pages 3
 Contains extraction instructions and context:
 ```
 read from page 131 to page 198 to extract the course information into csv, refer to the sample input. 
-In the header "ACC 200 Introduction to Financial Accounting (3-1T) A": 
+In the header "--the expect header is here--": 
 - A means Annually, other value is B means Biennially (every other year). 
 - 3 means Units = 3
 
 Sample input in page 131
-ACC 200 Introduction to Financial Accounting (3-1T) A 
-This course focuses on the accounting concepts...
-Prerequisite: BUS 100
+--the expect header is here-- 
+--other content is here--
 
 Expected output csv:
 course_code,course_title,units,section,description,prerequisites...
@@ -98,12 +97,12 @@ Please extract course information following these exact guidelines and CSV forma
 
 ## 🛠️ Configuration Options
 
-### batch_extract_courses.py Options
+### batch_extract_items.py Options
 - `--folder FOLDER`: Process specific folder only
 - `--max-pages N`: Pages per extraction call (default: 3)
 - `--list-folders`: Show available folders
 
-### extract_courses.py Options (Enhanced)
+### extract_items.py Options (Enhanced)
 - `--use-guidelines`: Use folder guidelines (default: True)
 - `--pdf-folder FOLDER`: Specify folder
 - `--max-pages N`: Maximum pages to read
@@ -113,7 +112,7 @@ Please extract course information following these exact guidelines and CSV forma
 ### Generated Files
 ```
 course/233878/
-├── 131.csv              # Extracted courses from page 131+
+├── 131.csv              # Extracted items from page 131+
 ├── 131_combined.txt     # Combined text from pages
 ├── 134.csv              # Next batch starting from page 134
 ├── 134_combined.txt
@@ -126,7 +125,7 @@ course/233878/
 - `units`: 3
 - `section`: A, B, or blank
 - `description`: Full course description
-- `prerequisites`: Required courses
+- `prerequisites`: Required items
 - `corequisites`: Concurrent requirements
 - `recommended`: Suggested background
 - `offered`: Annually, Biennially, etc.
@@ -148,7 +147,7 @@ course/233878/
 
 1. **Setup**: Place PDFs and guidelines in `input/folder_name/`
 2. **Extract Pages**: Run `extract_pdf_to_pages.py` to create page images
-3. **Batch Extract**: Use `batch_extract_courses.py` for page ranges
+3. **Batch Extract**: Use `batch_extract_items.py` for page ranges
 4. **Review Results**: Check `course/folder_name/` for CSV files
 
 ## 🔍 Troubleshooting
