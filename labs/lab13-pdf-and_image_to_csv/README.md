@@ -71,13 +71,6 @@ The `process_items.py` script implements a **4-step clean workflow**:
 - Creates individual CSV files per batch
 - Generates consolidated CSV with all extracted items
 
-## 📊 Sample Results
-
-**Extraction Statistics from Real Run:**
-- **Pages Processed**: 131-198 (68 pages)
-- **Batches Created**: 34 batches
-- **items Extracted**: 591 items
-- **Success Rate**: 100%
 
 
 ## 🔧 Configuration Options
