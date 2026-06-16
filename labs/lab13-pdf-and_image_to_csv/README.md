@@ -133,30 +133,8 @@ Key packages (see `requirements.txt` for complete list):
 - `openai` - Azure OpenAI integration
 - `pypdf` - PDF text extraction
 - `python-dotenv` - Environment configuration
-- `pandas` - Data processing
 
-## ⚡ Performance Tips
 
-1. **Batch Size**: Use `--max-pages 2-5` for optimal performance
-2. **Large PDFs**: Process will automatically handle pagination
-3. **API Limits**: Script includes error handling for rate limits
-4. **Memory**: Each page extracted to individual files for efficient processing
-
-## 🎯 Use Cases
-
-- **University Catalogs**: Extract course information from academic catalogs
-- **Training Materials**: Process corporate training course documents  
-- **Curriculum Analysis**: Bulk extraction for educational research
-- **Data Migration**: Convert legacy PDF catalogs to structured data
-
-## ✅ Success Metrics
-
-The system has been successfully tested with:
-- ✅ 206-page PDF documents
-- ✅ 591 course extractions in single run
-- ✅ Complex course descriptions with prerequisites
-- ✅ Multiple department classifications
-- ✅ Frequency coding (Annual/Biennial/Occasional)
 
 ## 🔧 Troubleshooting
 
