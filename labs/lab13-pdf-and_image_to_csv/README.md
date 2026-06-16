@@ -1,6 +1,6 @@
 # PDF Content Extraction System
 
-This project provides a **clean, automated workflow** for extracting course information from PDF documents using **Azure OpenAI** and **LangChain**. The system automatically processes PDF pages, detects course content, and exports structured data to CSV format.
+This project provides a **clean, automated workflow** for extracting course information from PDF documents using **Azure OpenAI** and **LangChain**. The system automatically processes PDF pages and exports structured data to CSV format.
 
 ## 🌟 Key Features
 
