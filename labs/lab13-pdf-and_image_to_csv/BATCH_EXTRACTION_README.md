@@ -119,19 +119,7 @@ course/233878/
 └── ...
 ```
 
-### CSV Columns
-- `course_code`: ACC 301
-- `course_title`: Intermediate Financial Accounting I
-- `units`: 3
-- `section`: A, B, or blank
-- `description`: Full course description
-- `prerequisites`: Required items
-- `corequisites`: Concurrent requirements
-- `recommended`: Suggested background
-- `offered`: Annually, Biennially, etc.
-- `grade_basis`: Grading method
-- `pdf_page`: Source page number
-- `department`: Academic department
+
 
 ## 🎯 Key Features
 
