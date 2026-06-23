@@ -321,6 +321,98 @@ Python sets `__name__` to `"__main__"` when a script is run directly (e.g., `pyt
 
 ---
 
+## 20. `initialize_agent`, `AgentType`, and `DuckDuckGoSearchRun`
+
+The README uses the classic `initialize_agent` API alongside `AgentType` enums and a built-in search tool:
+
+```python
+from langchain.tools import Tool, DuckDuckGoSearchRun
+from langchain.agents import AgentType, initialize_agent
+
+tools = [calculator_tool, text_analyzer, DuckDuckGoSearchRun()]
+
+agent = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True,
+    handle_parsing_errors=True,
+    max_iterations=10,
+)
+```
+
+| Component | Description |
+|---|---|
+| `DuckDuckGoSearchRun()` | Pre-built LangChain tool that performs a DuckDuckGo web search. No API key required. |
+| `AgentType.ZERO_SHOT_REACT_DESCRIPTION` | Enum value selecting the ReAct strategy where the agent picks tools based solely on their descriptions (no example shots). |
+| `initialize_agent(tools, llm, agent, ...)` | Convenience factory that creates and configures an agent executor. |
+| `verbose=True` | Prints the agent's internal reasoning steps (Thought / Action / Observation) to stdout. |
+| `handle_parsing_errors=True` | Instructs the agent to recover gracefully when the LLM produces malformed output instead of raising an exception. |
+| `max_iterations=10` | Caps how many Thought–Action–Observation cycles the agent may perform before stopping. |
+
+Running the agent with `initialize_agent` uses `.run()` instead of `.invoke()`:
+
+```python
+result = agent.run("What is 25 * 4 + 10?")
+```
+
+**`agent.run(query)`** accepts a plain string and returns the agent's final answer as a string (compare with `agent.invoke()`, which accepts a dict and returns a dict).
+
+---
+
+## 21. Boolean Operators: `not`, `or`, `and`
+
+```python
+if not text or not text.strip():
+    return "Analysis: 0 words, 0 sentences, 0 characters (empty text)"
+```
+
+```python
+if not os.getenv("AZURE_OPENAI_API_KEY"):
+    print("Error: AZURE_OPENAI_API_KEY not set")
+    return
+```
+
+| Operator | Meaning |
+|---|---|
+| `not x` | `True` if `x` is falsy (empty string, `None`, `0`, empty list, …). |
+| `x or y` | Evaluates to `x` if `x` is truthy, otherwise to `y`. Used here as a short-circuit guard. |
+| `x and y` | Evaluates to `x` if `x` is falsy, otherwise to `y`. |
+
+The pattern `if not text or not text.strip()` is a **guard clause** – it exits the function early when the input is `None`, an empty string, or a string of only whitespace.
+
+---
+
+## 22. String Repetition
+
+```python
+print("=" * 80)
+```
+
+The `*` operator applied to a string and an integer repeats the string that many times. `"=" * 80` produces a line of 80 equals signs, commonly used as a visual separator in terminal output.
+
+---
+
+## 23. Multi-Line String with Parentheses
+
+```python
+return (
+    f"Analysis: {len(words)} words, {len(sentences)} sentences, {len(text)} characters"
+)
+
+complex_query = (
+    "I need to: "
+    "1. Calculate 15% of 200, "
+    "2. Check the weather in London, "
+    "3. Analyze this text: 'The quick brown fox jumps over the lazy dog', "
+    "4. Convert 100 cm to meters"
+)
+```
+
+Wrapping an expression in parentheses `(...)` lets you split it across multiple lines without needing a backslash `\`. Adjacent string literals are automatically **concatenated** by Python at compile time, so the second example produces a single long string. This is the preferred style for long strings or expressions.
+
+---
+
 ## Best Practices Demonstrated in This Lab
 
 1. **Validate `eval()` input** – restrict allowed characters before calling `eval()` to prevent injection attacks.
@@ -356,3 +448,8 @@ Python sets `__name__` to `"__main__"` when a script is run directly (e.g., `pyt
 | `agent.invoke()` | Running the agent |
 | `for` loop + `range()` | Retry loop in `safe_agent_run()` |
 | `if __name__ == "__main__"` | Script entry-point guard |
+| `initialize_agent`, `AgentType`, `DuckDuckGoSearchRun` | Alternative agent construction API shown in README |
+| `agent.run()` | Running an `initialize_agent`-style agent with a plain string query |
+| `not` / `or` / `and` | Boolean guard clauses (`if not text or not text.strip()`) |
+| `"=" * 80` | String repetition for terminal separators |
+| Multi-line string with `()` | Splitting long strings/expressions across lines |
