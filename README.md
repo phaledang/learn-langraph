@@ -56,7 +56,17 @@ learn-langraph/
 │   ├── 02-langchain-advanced.md
 │   ├── 03-langgraph-fundamentals.md
 │   ├── 04-langsmith-monitoring.md
-│   └── 05-langchain-mcp.md
+│   ├── 05-langchain-mcp.md
+│   ├── 06-langgraph-stateful.md
+│   ├── 07-langgraph-multiagent.md
+│   ├── 08-langgraph-persistence.md
+│   ├── 09-langsmith-tracing.md
+│   ├── 10-langsmith-evaluation.md
+│   ├── 11-mcp-integration.md
+│   ├── 12-mcp-advanced.md
+│   ├── 13-pdf-image-to-csv.md
+│   ├── 14-mcp-server.md
+│   └── 15-mcp-sharepoint.md
 ├── labs/
 │   ├── lab01-langchain-basics/
 │   │   ├── README.md
